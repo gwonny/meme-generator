@@ -5,7 +5,7 @@ import random
 import discord
 from dotenv import load_dotenv
 
-image_types = ["png", "jpeg", "gif", "jpg"]
+image_types = ["png", "jpg"]
 
 counter = 0
 
@@ -20,30 +20,29 @@ async def on_ready():
 
 @client.event
 async def on_message(message: discord.Message):
+    #Ignore bot messages, to prevent infinite loop
     if message.author.bot: return
+    
+    #
     if message.content == "exit":
         await client.logout()
     
     response = message.content
-    #counter = random.randint(0,10000)
-    found = False
-    filename = ""
-    #response = "hi"
-    #await message.channel.send(response)
+    counter = str(random.randint(0,100000))
+    filename = ''
     for attachment in message.attachments:
         if any(attachment.filename.lower().endswith(image) for image in image_types):
-            filename = attachment.filename
+            filename = counter + attachment.filename[-4:]
             await attachment.save(filename)
-            found = True
 
-    if not found: return
-    #Save Attachment
+    if filename == '': return
     #Do work on images
     #Modify Image
-    if (response == ""): response = 'When you nut but she keeps sucking'
-
-    
-    
+    if (response == ''): response = 'When you nut but she keeps sucking'
+    #response = generateResponse(response)
+    #createPhoto(response)
     await message.channel.send(file=discord.File(filename))
+
+    os.remove(filename)
 
 client.run(TOKEN)
