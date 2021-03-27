@@ -1,14 +1,4 @@
 # bot.py
-
-"""
-STATE = {
-    name: {
-        img
-        caption
-    }
-}
-"""
-
 import os
 import random
 
@@ -22,8 +12,15 @@ image_types = ["png", "jpg"]
 # SET UP
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
-STATE = {}
 bot = commands.Bot(command_prefix='!')
+STATE = {}
+"""
+STATE = {
+    name: {
+        img
+    }
+}
+"""
 
 @bot.event
 async def on_ready():
@@ -33,7 +30,6 @@ async def on_ready():
 @bot.command(help="disconnect bot")
 async def exit(ctx):
     #Allow user to close bot from discord
-    print('EXIT MESSAGE SENT')
     await bot.logout()
 
 #Images
@@ -41,8 +37,12 @@ async def exit(ctx):
 async def on_message(message):
     #Ignore bot messages, to prevent infinite loop
     if message.author.bot: return
+
+    # set user ID in state if it doesn't already exist
     user_id = str(message.author.id)
     if user_id not in STATE: STATE[user_id] = {}
+
+    # check that the message has an attachment and that the attachment is a jpg or png
     filename = ''
     for attachment in message.attachments:
         if any(attachment.filename.lower().endswith(image) for image in image_types):
@@ -53,10 +53,11 @@ async def on_message(message):
         await bot.process_commands(message)
         return
     STATE[user_id]['img'] = filename
+
     print(STATE)
 
 #Memeify
-@bot.command(help="generate your meme")
+@bot.command(help="!meme <top caption> | <bottom caption>")
 async def meme(ctx, *input_caption):
     user_id = str(ctx.message.author.id)
 
@@ -69,7 +70,7 @@ async def meme(ctx, *input_caption):
     if user_id not in STATE: STATE[user_id] = {}
     
     if 'img' not in STATE[user_id] or not STATE[user_id]['img']:
-        ctx.message.channel.send("Input an image first")
+        ctx.message.channel.send("Upload a jpg or png image first")
 
     #Perform Memeify Function here
     add_text(STATE[user_id]['img'], caption, 50, STATE[user_id]['img'])
