@@ -63,6 +63,10 @@ async def on_message(message):
 async def meme(ctx, *input_caption):
     user_id = str(ctx.message.author.id)
 
+    if 'img' not in STATE[user_id] or not STATE[user_id]['img']:
+        await ctx.message.channel.send("Upload a jpg or png image first")
+        return
+
     # set caption
     caption = ' '.join(input_caption).strip()
     if not caption:
@@ -71,10 +75,6 @@ async def meme(ctx, *input_caption):
 
     if user_id not in STATE: STATE[user_id] = {}
     
-    if 'img' not in STATE[user_id] or not STATE[user_id]['img']:
-        ctx.message.channel.send("Upload a jpg or png image first")
-
-
     file_name = STATE[user_id]['img']
     file_type = file_name[-4:]
     modified_file_name = file_name[:-4] + "_modified" + file_type
