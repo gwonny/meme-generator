@@ -5,7 +5,7 @@ import random
 import discord
 from dotenv import load_dotenv
 from discord.ext import commands
-from img_utils import add_text
+from img_utils import add_text, find_color_text
 from essential_generators import DocumentGenerator
 
 image_types = ["png", "jpg"]
@@ -56,10 +56,8 @@ async def on_message(message):
         return
     STATE[user_id]['img'] = filename
 
-    print(STATE)
-
 #Memeify
-@bot.command(help="!meme <top caption> | <bottom caption>")
+@bot.command(help="!meme <top caption> | <bottom caption> | !color:<text color>")
 async def meme(ctx, *input_caption):
     user_id = str(ctx.message.author.id)
 
@@ -70,18 +68,32 @@ async def meme(ctx, *input_caption):
     # set caption
     caption = ' '.join(input_caption).strip()
     if not caption:
-        # generate caption here
-        pass
+        caption = gen.sentence()
+    
+    # parse caption
+    texts = caption.split('|')
+    color = 'white'
+    bottom = ''
+    
+    if '!color:' in caption:
+        color = find_color_text(caption, '!color:', 'white')
+        texts.pop()
+
+    if len(texts) == 2:
+        bottom = texts[1]
+    if len(texts) >= 1:
+        top = texts[0]
+    if len(texts) == 0:
+        top = gen.sentence()
 
     if user_id not in STATE: STATE[user_id] = {}
     
     file_name = STATE[user_id]['img']
     file_type = file_name[-4:]
     modified_file_name = file_name[:-4] + "_modified" + file_type
+    
     #Perform Memeify Function here
-    if caption == '$caption':
-        caption = gen.sentence()
-    add_text(file_name, caption, 50, modified_file_name)
+    add_text(file_name, caption, 50, modified_file_name, top, bottom, color)
     await ctx.message.channel.send(file=discord.File(modified_file_name))
     os.remove(modified_file_name)
 
