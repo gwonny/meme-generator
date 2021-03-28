@@ -1,5 +1,5 @@
 discord.py
-dotenv
+python-dotenv
 opencv-python
 pillow
 essential_generators
