@@ -6,6 +6,7 @@ import discord
 from dotenv import load_dotenv
 from discord.ext import commands
 from img_utils import add_text
+from essential_generators import DocumentGenerator
 
 image_types = ["png", "jpg"]
 
@@ -14,6 +15,7 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 bot = commands.Bot(command_prefix='!')
 STATE = {}
+gen = DocumentGenerator()
 """
 STATE = {
     name: {
@@ -72,10 +74,13 @@ async def meme(ctx, *input_caption):
     if 'img' not in STATE[user_id] or not STATE[user_id]['img']:
         ctx.message.channel.send("Upload a jpg or png image first")
 
+
     file_name = STATE[user_id]['img']
     file_type = file_name[-4:]
     modified_file_name = file_name[:-4] + "_modified" + file_type
     #Perform Memeify Function here
+    if caption == '$caption':
+        caption = gen.sentence()
     add_text(file_name, caption, 50, modified_file_name)
     await ctx.message.channel.send(file=discord.File(modified_file_name))
     os.remove(modified_file_name)
