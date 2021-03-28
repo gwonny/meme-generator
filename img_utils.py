@@ -30,20 +30,3 @@ def add_text(img, msg, fontsize, filename):
         w, h = style.getsize(msg)
         draw.text(((W-w)/2,((H-h)/2)/10), msg, font=style, fill="white")
         im.save(filename)
-
-def main():
-    add_text('400.jpg', 'hunter x | hunter ', 50, '400.png')
-
-if __name__ == '__main__':
-    main()
-
-
-
-
-
-# 300 x 300 = 11 chars
-# 400 x 400 = 18 chars
-# 500 x 500 = 23 chars
-
-
-
